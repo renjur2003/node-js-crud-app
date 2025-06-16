@@ -40,6 +40,10 @@ app.set("view engine", "ejs");
 // route prefix 
 app.use("",require("./routes/routes")); 
 
+const authRoutes = require('./routes/authRoutes');
+app.use('/', authRoutes); // mount auth routes
+
+
 
 app.listen( port,() => {
     console.log(`server started at http://localhost:${port}`);

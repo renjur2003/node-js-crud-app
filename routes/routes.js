@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
 const multer = require('multer');
+const requireAuth = require('../middlewares/authMiddleware');
 
 // image upload config
 const storage = multer.diskStorage({
