@@ -9,7 +9,7 @@ const port = process.env.port || 4000;
 
 // Connect to MongoDB
 mongoose.connect(process.env.DB_URI, {
-    useNewUrlParser: true,
+    useNewUrlParser: true, 
     useUnifiedTopology: true,
   }).then(() => console.log("MongoDB Connected"))
     .catch((err) => console.log(err));
@@ -41,7 +41,7 @@ app.set("view engine", "ejs");
 app.use("",require("./routes/routes")); 
 
 const authRoutes = require('./routes/authRoutes');
-app.use('/', authRoutes); // mount auth routes
+app.use('/login', authRoutes); // mount auth routes
 
 
 
