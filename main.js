@@ -37,15 +37,14 @@ app.use('/uploads', express.static('uploads'));
 app.set("view engine", "ejs");
 
 
-// route prefix 
-app.use("",require("./routes/routes")); 
-
+// Routes
 const authRoutes = require('./routes/authRoutes');
-app.use('/login', authRoutes); // mount auth routes
+const userRoutes = require('./routes/routes');
 
+app.use('/', authRoutes);   // handles /login, /register, /logout
+app.use('/', userRoutes);   // handles / (index), /add, /edit
 
-
-app.listen( port,() => {
-    console.log(`server started at http://localhost:${port}`);
-    
+// Start Server
+app.listen(port, () => {
+  console.log(`server started at http://localhost:${port}`);
 });

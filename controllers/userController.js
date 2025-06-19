@@ -32,11 +32,16 @@ exports.insertUser = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
-    res.render("index", { title: "Home page", users: users });
+    res.render("index", {
+      title: "Home page",
+      users: users,
+      user: req.session.user // ✅ Add this line
+    });
   } catch (err) {
     res.json({ message: err.message });
   }
 };
+
 
 // Show add form
 exports.showAddForm = (req, res) => {

@@ -1,7 +1,8 @@
 const Auth = require('../models/auth');
 
 exports.registerUser = async (req, res) => {
-  const { username, password } = req.body;
+  const { username, email, password } = req.body;
+   console.log("Form Data:", { username, email, password });
   try {
     const existUser = await Auth.findOne({ username });
     if (existUser) {
@@ -9,14 +10,17 @@ exports.registerUser = async (req, res) => {
       return res.redirect('/register');
     }
 
-    const user = new Auth({ username, password });
+    const user = new Auth({ username, email, password });
+     console.log(" Saving user to DB..."); //  log before saving
     await user.save();
+     console.log(" User saved successfully!");
 
     req.session.message = { type: 'success', message: 'Registered Successfully' };
     res.redirect('/login');
   } catch (err) {
-    res.status(500).send('Server error');
-  }
+  console.error(" Register Error:", err.message);
+  res.status(500).send('Server error: ' + err.message);
+}
 };
 
 exports.loginUser = async (req, res) => {

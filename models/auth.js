@@ -12,6 +12,12 @@ const AuthSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+  },
 });
 
 // Hash password before saving
