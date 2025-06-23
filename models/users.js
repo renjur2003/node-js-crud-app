@@ -23,6 +23,11 @@ const userschema = new mongoose.Schema({
         required: true,
         default: Date.now,
     },
+     createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Auth',
+        required: true,
+    },
 });
 
 module.exports = mongoose.model('User', userschema);

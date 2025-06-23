@@ -1,7 +1,7 @@
 const Auth = require('../models/auth');
 
 exports.registerUser = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, role } = req.body;
    console.log("Form Data:", { username, email, password });
   try {
     const existUser = await Auth.findOne({ username });
@@ -10,7 +10,7 @@ exports.registerUser = async (req, res) => {
       return res.redirect('/register');
     }
 
-    const user = new Auth({ username, email, password });
+    const user = new Auth({ username, email, password, role: role || 'user' }); // Default role to 'user' if not provided
      console.log(" Saving user to DB..."); //  log before saving
     await user.save();
      console.log(" User saved successfully!");

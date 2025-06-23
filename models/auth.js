@@ -18,6 +18,11 @@ const AuthSchema = new mongoose.Schema({
     unique: true,
     trim: true,
   },
+   role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user", // ✅ Default is "user"
+  },
 });
 
 // Hash password before saving
