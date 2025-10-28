@@ -13,6 +13,7 @@ exports.insertUser = async (req, res) => {
       email: req.body.email,
       phone: req.body.phone,
       image: req.file.filename,
+      createdBy: req.session.user._id, // Use the logged-in user's ID
     });
 
     await user.save();
@@ -51,9 +52,18 @@ exports.showAddForm = (req, res) => {
 // Show edit form
 exports.showEditForm = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.redirect("/");
-    res.render("edit_users", { title: "Edit User", user: user });
+   const userData = await User.findById(req.params.id);
+if (!userData) return res.redirect("/");
+
+//  New permission check
+if (
+  req.session.user.role !== "admin" && 
+  userData.createdBy.toString() !== req.session.user._id.toString()
+) {
+  return res.status(403).send("Not Authorized");
+}
+res.render("edit_users", { title: "Edit User", user: userData });
+
   } catch (err) {
     console.error("Edit error:", err.message);
     res.redirect("/");
@@ -61,22 +71,35 @@ exports.showEditForm = async (req, res) => {
 };
 
 // Update user
+// ✅ UPDATE USER
 exports.updateUser = async (req, res) => {
-  let id = req.params.id;
-  let new_image = "";
-
-  if (req.file) {
-    new_image = req.file.filename;
-    try {
-      fs.unlinkSync('./uploads/' + req.body.old_image);
-    } catch (err) {
-      console.error("Image delete error:", err.message);
-    }
-  } else {
-    new_image = req.body.old_image;
-  }
-
   try {
+    const id = req.params.id;
+
+    // Find user record
+    const userData = await User.findById(id);
+    if (!userData) return res.redirect("/");
+
+    // ✅ Owner or Admin can edit
+    if (
+      req.session.user.role !== "admin" && 
+      userData.createdBy.toString() !== req.session.user._id.toString()
+    ) {
+      return res.status(403).send("Not Authorized");
+    }
+
+    // Proceed with the update
+    let new_image = req.body.old_image;
+
+    if (req.file) {
+      new_image = req.file.filename;
+      try {
+        fs.unlinkSync('./uploads/' + req.body.old_image);
+      } catch (err) {
+        console.error("Image delete error:", err.message);
+      }
+    }
+
     await User.findByIdAndUpdate(id, {
       name: req.body.name,
       email: req.body.email,
@@ -88,20 +111,36 @@ exports.updateUser = async (req, res) => {
       type: "success",
       message: "User updated successfully",
     };
-
     res.redirect("/");
+
   } catch (err) {
     res.json({ message: err.message, type: "danger" });
   }
 };
 
-// Delete user
+
+// ✅ DELETE USER
 exports.deleteUser = async (req, res) => {
   try {
-    const result = await User.findByIdAndDelete(req.params.id);
-    if (result && result.image) {
+    const id = req.params.id;
+
+    // Find user record
+    const userData = await User.findById(id);
+    if (!userData) return res.redirect("/");
+
+    // ✅ Owner or Admin can delete
+    if (
+      req.session.user.role !== "admin" && 
+      userData.createdBy.toString() !== req.session.user._id.toString()
+    ) {
+      return res.status(403).send("Not Authorized");
+    }
+
+    // Proceed with delete
+    await User.findByIdAndDelete(id);
+    if (userData.image) {
       try {
-        fs.unlinkSync('./uploads/' + result.image);
+        fs.unlinkSync('./uploads/' + userData.image);
       } catch (err) {
         console.error("Delete image error:", err.message);
       }
@@ -111,8 +150,8 @@ exports.deleteUser = async (req, res) => {
       type: "info",
       message: "User deleted successfully",
     };
-
     res.redirect("/");
+
   } catch (err) {
     res.json({ message: err.message });
   }

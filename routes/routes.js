@@ -15,6 +15,8 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage }).single("image");
 
+
+
 // Routes
 router.get("/", isAuthenticated, userController.getAllUsers);
 router.get("/add", isAuthenticated, userController.showAddForm);

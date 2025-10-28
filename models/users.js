@@ -28,6 +28,7 @@ const userschema = new mongoose.Schema({
         ref: 'Auth',
         required: true,
     },
+    
 });
 
 module.exports = mongoose.model('User', userschema);
